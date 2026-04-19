@@ -26,7 +26,7 @@ Python port of [AnalogSense.js](https://github.com/AnalogSense/JavaScript-SDK/) 
 ## Installation
 ```bash
 pip install hid
-pip install
+pip install AnalogSensePy
 ```
 On Linux you may need udev rules or `sudo` for hid
 
