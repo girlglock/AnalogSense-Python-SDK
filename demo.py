@@ -16,12 +16,12 @@ else:
 
 def on_keys(active_keys):
     for k in active_keys:
-        #converting the scancode to a nice readable string
+        # converting the scancode to a nice readable string
         name = as_.scancode_to_string(k["scancode"])
         
-        #some providers can return the digital state of the key
-        #(what the system perceives the key as pressed or not)
-        #other providers that do not support this will return None
+        # some providers can return the digital state of the key
+        # (what the system perceives the key as pressed or not)
+        # other providers that do not support this will return None
         if k["digital"] is not None:
             digital = " [down]" if k["digital"] else " [up]"
         else:
