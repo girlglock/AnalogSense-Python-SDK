@@ -10,7 +10,7 @@ try:
     _HID_AVAILABLE = True
 except ImportError:
     _HID_AVAILABLE = False
-    warnings.warn("'hid' is not installed. you can install it with: pip install hid")
+    warnings.warn("'hidapi' is not installed. you can install it with: pip install hidapi")
 
 
 class DeviceHandle:
