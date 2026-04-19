@@ -38,7 +38,7 @@ class AsProvider:
             pass
 
     def _buffer_to_active_keys(self):
-        return [{"scancode": sc, "value": v} for sc, v in self._buffer.items()]
+        return [{"scancode": sc, "value": v, "digital": None} for sc, v in self._buffer.items()]
 
     def start_listening(self, handler: Handler):
         raise NotImplementedError
@@ -88,10 +88,10 @@ class AsProviderWootingV1(AsProvider):
             if i >= len(data): break
             value = data[i]
             i += 1
-            active_keys.append({"scancode": scancode, "value": value / 255})
+            active_keys.append({"scancode": scancode, "value": value / 255, "digital": None})
             current_scancodes.add(scancode)
         for released in self._prev_scancodes - current_scancodes:
-            active_keys.append({"scancode": released, "value": 0.0})
+            active_keys.append({"scancode": released, "value": 0.0, "digital": None})
         self._prev_scancodes = current_scancodes
         handler(active_keys)
 
@@ -115,6 +115,7 @@ class AsProviderWootingV2(AsProvider):
             keycode  = data[i + 1]
             packed   = data[i + 2]
             value_hi = data[i + 3]
+            digital  = packed & 0x1
             key_ns   = (packed >> 2) & 0xF
             value_lo = (packed >> 6) & 0x3
             scancode = (key_ns << 8) | keycode
@@ -122,10 +123,10 @@ class AsProviderWootingV2(AsProvider):
             i += 4
             if scancode == 0: break
             if value == 0: continue
-            active_keys.append({"scancode": scancode, "value": value / 1023})
+            active_keys.append({"scancode": scancode, "value": value / 1023, "digital": digital})
             current_scancodes.add(scancode)
         for released in self._prev_scancodes - current_scancodes:
-            active_keys.append({"scancode": released, "value": 0.0})
+            active_keys.append({"scancode": released, "value": 0.0, "digital": 0})
         self._prev_scancodes = current_scancodes
         handler(active_keys)
 
@@ -153,10 +154,10 @@ class AsProviderRazerHuntsman(AsProvider):
             value = data[i]; i += 1
             hid_sc = _razer_to_hid(scancode)
             if hid_sc:
-                active_keys.append({"scancode": hid_sc, "value": value / 255})
+                active_keys.append({"scancode": hid_sc, "value": value / 255, "digital": None})
                 current_scancodes.add(hid_sc)
         for released in self._prev_scancodes - current_scancodes:
-            active_keys.append({"scancode": released, "value": 0.0})
+            active_keys.append({"scancode": released, "value": 0.0, "digital": None})
         self._prev_scancodes = current_scancodes
         handler(active_keys)
 
@@ -186,10 +187,10 @@ class AsProviderRazerHuntsmanV3(AsProvider):
             _unused = data[i]; i += 1
             hid_sc = _razer_to_hid(scancode)
             if hid_sc:
-                active_keys.append({"scancode": hid_sc, "value": value / 255})
+                active_keys.append({"scancode": hid_sc, "value": value / 255, "digital": None})
                 current_scancodes.add(hid_sc)
         for released in self._prev_scancodes - current_scancodes:
-            active_keys.append({"scancode": released, "value": 0.0})
+            active_keys.append({"scancode": released, "value": 0.0, "digital": None})
         self._prev_scancodes = current_scancodes
         handler(active_keys)
 
@@ -252,7 +253,7 @@ class AsProviderDrunkdeer(AsProvider):
                     value = data[i]
                     if value != 0:
                         sc = drunkdeer_index_to_hid_scancode(n * (64 - 5) + (i - 4))
-                        self._active_keys.append({"scancode": sc, "value": value / 40})
+                        self._active_keys.append({"scancode": sc, "value": value / 40, "digital": None})
                 if n == 2:
                     handler(list(self._active_keys))
                     self._active_keys = []
