@@ -27,8 +27,24 @@ Python port of [AnalogSense.js](https://github.com/AnalogSense/JavaScript-SDK/) 
 ```bash
 pip install AnalogSensePy
 ```
-On Linux you may need udev rules or `sudo` for hid
 
+On Linux you may need udev rules or `sudo` for hid
+```bash
+printf '%s\n' \
+  'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="31e3", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="03eb", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="1532", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="19f5", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="352d", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="3434", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="362d", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="373b", MODE="0660", GROUP="input"' \
+  'SUBSYSTEM=="usb", ATTRS{idVendor}=="372e", MODE="0660", GROUP="input"' \
+  | sudo tee /etc/udev/rules.d/99-analogsense.rules
+
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
 ## Usage
 ```python
 from analogsense import AnalogSense

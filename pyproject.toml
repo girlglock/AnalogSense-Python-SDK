@@ -4,6 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "AnalogSensePy"
-version = "1.0.4"
+version = "1.0.5"
 requires-python = ">=3.10"
-dependencies = ["hidapi"]
+dependencies = [
+    "hid; sys_platform == 'linux'",
+    "hidapi; sys_platform != 'linux'",
+]

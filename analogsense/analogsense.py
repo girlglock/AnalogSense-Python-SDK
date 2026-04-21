@@ -1,4 +1,5 @@
 from __future__ import annotations
+import sys
 import warnings
 
 from .providers import ALL_PROVIDERS, AsProvider
@@ -10,7 +11,10 @@ try:
     _HID_AVAILABLE = True
 except ImportError:
     _HID_AVAILABLE = False
-    warnings.warn("'hidapi' is not installed. you can install it with: pip install hidapi")
+    if sys.platform == "linux":
+        warnings.warn("'hid' is not installed. you can install it with: pip install hid")
+    else:
+        warnings.warn("'hidapi' is not installed. you can install it with: pip install hidapi")
 
 
 class DeviceHandle:
@@ -44,11 +48,10 @@ class AnalogSense:
         seen = set()
         for provider_cls in self.providers:
             for f in provider_cls.FILTERS:
-                kwargs = {}
-                if "vendor_id" in f:  kwargs["vendor_id"]  = f["vendor_id"]
-                if "product_id" in f: kwargs["product_id"] = f["product_id"]
                 try:
-                    for info in _hid.enumerate(**kwargs):
+                    vendor_id  = f.get("vendor_id", 0)
+                    product_id = f.get("product_id", 0)
+                    for info in _hid.enumerate(vendor_id, product_id):
                         dedup_key = (info["vendor_id"], info["product_id"], info.get("usage_page", 0), info.get("usage", 0))
                         if dedup_key in seen: continue
                         if "usage_page" in f and info.get("usage_page") != f["usage_page"]: continue
@@ -59,13 +62,26 @@ class AnalogSense:
         return candidates
 
     def _open(self, info, provider_cls):
-        dev = _hid.device()
-        dev.open_path(info["path"])
-        return provider_cls(DeviceHandle(dev, info))
+        try:
+            if sys.platform == "linux":
+                dev = _hid.Device(path=info["path"])
+            else:
+                dev = _hid.device()
+                dev.open_path(info["path"])
+            return provider_cls(DeviceHandle(dev, info))
+        except Exception as e:
+            if "Permission denied" in str(e):
+                warnings.warn(
+                    f"Permission denied opening {info.get('product_string', info['path'])}. "
+                    "On Linux, udev rules are required. See: https://github.com/girlglock/AnalogSense-Python-SDK#installation"
+                )
+            else:
+                warnings.warn(f"Failed to open device: {e}")
+            return None
 
     def get_devices(self):
         if not _HID_AVAILABLE: return []
-        return [self._open(info, cls) for info, cls in self._collect_candidates()]
+        return [dev for dev in (self._open(info, cls) for info, cls in self._collect_candidates()) if dev is not None]
 
     def open_device(self, vendor_id, product_id):
         if not _HID_AVAILABLE: return None
