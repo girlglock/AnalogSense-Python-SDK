@@ -19,7 +19,7 @@ Python port of [AnalogSense.js](https://github.com/AnalogSense/JavaScript-SDK/) 
 - Madlions MAD68R<sup>P</sup>
 - Redragon K709HE<sup>P</sup><sup>T</sup>
 
-<sup>T</sup> Tested and should work.
+<sup>T</sup> Tested and should work.  
 <sup>R</sup> Razer Synapse needs to be installed and running for analogue inputs to be received from this keyboard.  
 <sup>P</sup> The official firmware only supports polling, which can lead to lag and missed inputs.  
 <sup>F</sup> [Custom firmware with full analog report functionality is available](https://analogsense.org/firmware/).
