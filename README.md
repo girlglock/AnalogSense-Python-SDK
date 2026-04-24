@@ -1,7 +1,7 @@
 # AnalogSense Python SDK
 Python port of [AnalogSense.js](https://github.com/AnalogSense/JavaScript-SDK/) for analog keyboard input.
 ## Supported Keyboards/Devices
-- Everything by Wooting
+- Everything by Wooting<sup>T</sup>
 - Everything by NuPhy
 - Everything by DrunkDeer
 - Razer Huntsman V2 Analog<sup>R</sup>
@@ -17,8 +17,9 @@ Python port of [AnalogSense.js](https://github.com/AnalogSense/JavaScript-SDK/) 
 - Madlions MAD60HE<sup>P</sup>
 - Madlions MAD68HE<sup>P</sup>
 - Madlions MAD68R<sup>P</sup>
-- Redragon K709HE<sup>P</sup>
+- Redragon K709HE<sup>P</sup><sup>T</sup>
 
+<sup>T</sup> Tested and should work.
 <sup>R</sup> Razer Synapse needs to be installed and running for analogue inputs to be received from this keyboard.  
 <sup>P</sup> The official firmware only supports polling, which can lead to lag and missed inputs.  
 <sup>F</sup> [Custom firmware with full analog report functionality is available](https://analogsense.org/firmware/).
