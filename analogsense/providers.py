@@ -133,9 +133,11 @@ class AsProviderWootingV2(AsProvider):
 
 class AsProviderRazerHuntsman(AsProvider):
     FILTERS = [
-        {"vendor_id": 0x1532, "product_id": 0x0266},
-        {"vendor_id": 0x1532, "product_id": 0x0282},
+        {"vendor_id": 0x1532, "product_id": 0x0266, "usage_page": 0x0001},  #Razer Huntsman V2
+        {"vendor_id": 0x1532, "product_id": 0x0282, "usage_page": 0x0001},  #Razer Huntsman Mini
     ]
+
+    _REPORT_ID = 7
 
     def start_listening(self, handler: Handler):
         self._running = True
@@ -144,7 +146,10 @@ class AsProviderRazerHuntsman(AsProvider):
         self._thread.start()
 
     def _handle_report(self, data: bytes, handler: Handler):
-        if data[0] != 7: return
+        if data[0] == self._REPORT_ID:
+            data = data[1:]
+        elif len(data) > 1 and data[0] != 0:
+            return
         active_keys = []
         current_scancodes = set()
         i = 1
@@ -164,10 +169,11 @@ class AsProviderRazerHuntsman(AsProvider):
 
 class AsProviderRazerHuntsmanV3(AsProvider):
     FILTERS = [
-        {"vendor_id": 0x1532, "product_id": 0x02A6},
-        {"vendor_id": 0x1532, "product_id": 0x02A7},
-        {"vendor_id": 0x1532, "product_id": 0x02B0},
+        {"vendor_id": 0x1532, "product_id": 0x02A6, "usage_page": 0x0001},  #Razer Huntsman V3 Pro
+        {"vendor_id": 0x1532, "product_id": 0x02A7, "usage_page": 0x0001},  #Razer Huntsman V3 Pro Tenkeyless
+        {"vendor_id": 0x1532, "product_id": 0x02B0, "usage_page": 0x0001},  #Razer Huntsman V3 Pro Mini
     ]
+    _REPORT_ID = 11
 
     def start_listening(self, handler: Handler):
         self._running = True
@@ -176,7 +182,10 @@ class AsProviderRazerHuntsmanV3(AsProvider):
         self._thread.start()
 
     def _handle_report(self, data: bytes, handler: Handler):
-        if data[0] != 11: return
+        if data[0] == self._REPORT_ID:
+            data = data[1:]
+        elif len(data) > 1 and data[0] != 0:
+            return
         active_keys = []
         current_scancodes = set()
         i = 1
@@ -194,10 +203,10 @@ class AsProviderRazerHuntsmanV3(AsProvider):
         self._prev_scancodes = current_scancodes
         handler(active_keys)
 
-
+#this one needs testing
 class AsProviderNuphy(AsProvider):
     FILTERS = [
-        {"vendor_id": 0x19F5},
+        {"vendor_id": 0x19F5, "usage_page": 0x0001, "usage": 0x0000},
     ]
 
     def start_listening(self, handler: Handler):
@@ -264,15 +273,15 @@ class AsProviderDrunkdeer(AsProvider):
 
 class AsProviderKeychron(AsProvider):
     FILTERS = [
-        {"vendor_id": 0x3434, "product_id": 0x0B10},
-        {"vendor_id": 0x3434, "product_id": 0x0B11},
-        {"vendor_id": 0x3434, "product_id": 0x0B12},
-        {"vendor_id": 0x3434, "product_id": 0x0B30},
-        {"vendor_id": 0x3434, "product_id": 0x0B50},
-        {"vendor_id": 0x3434, "product_id": 0x0E20},
-        {"vendor_id": 0x3434, "product_id": 0x0E21},
-        {"vendor_id": 0x3434, "product_id": 0x0E22},
-        {"vendor_id": 0x362D, "product_id": 0x0610},
+        {"vendor_id": 0x3434, "product_id": 0x0B10, "usage_page": 0xFF60, "usage": 0x61},  #Q1 HE ANSI
+        {"vendor_id": 0x3434, "product_id": 0x0B11, "usage_page": 0xFF60, "usage": 0x61},  #Q1 HE ISO
+        {"vendor_id": 0x3434, "product_id": 0x0B12, "usage_page": 0xFF60, "usage": 0x61},  #Q1 HE JIS
+        {"vendor_id": 0x3434, "product_id": 0x0B30, "usage_page": 0xFF60, "usage": 0x61},  #Q3 HE ANSI
+        {"vendor_id": 0x3434, "product_id": 0x0B50, "usage_page": 0xFF60, "usage": 0x61},  #Q5 HE ANSI
+        {"vendor_id": 0x3434, "product_id": 0x0E20, "usage_page": 0xFF60, "usage": 0x61},  #K2 HE ANSI
+        {"vendor_id": 0x3434, "product_id": 0x0E21, "usage_page": 0xFF60, "usage": 0x61},  #K2 HE ISO
+        {"vendor_id": 0x3434, "product_id": 0x0E22, "usage_page": 0xFF60, "usage": 0x61},  #K2 HE JIS
+        {"vendor_id": 0x362D, "product_id": 0x0610, "usage_page": 0xFF60, "usage": 0x61},  #Lemokey P1 HE ANSI
     ]
 
     _INIT_PAYLOAD = bytes([
@@ -373,15 +382,19 @@ class AsProviderKeychron(AsProvider):
 
 class AsProviderMadlions(AsProvider):
     FILTERS = [
-        {"vendor_id": 0x373B, "product_id": 0x1053},
-        {"vendor_id": 0x373B, "product_id": 0x1055},
-        {"vendor_id": 0x373B, "product_id": 0x1056},
-        {"vendor_id": 0x373B, "product_id": 0x105D},
-        {"vendor_id": 0x373B, "product_id": 0x1058},
-        {"vendor_id": 0x373B, "product_id": 0x1059},
-        {"vendor_id": 0x373B, "product_id": 0x105A},
-        {"vendor_id": 0x373B, "product_id": 0x105C},
-        {"vendor_id": 0x373B, "product_id": 0x10A7},
+        #MAD60HE
+        {"vendor_id": 0x373B, "product_id": 0x1053, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x1054, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x1055, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x1056, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x105D, "usage_page": 0xFF60, "usage": 0x61},
+        #MAD68HE
+        {"vendor_id": 0x373B, "product_id": 0x1058, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x1059, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x105A, "usage_page": 0xFF60, "usage": 0x61},
+        {"vendor_id": 0x373B, "product_id": 0x105C, "usage_page": 0xFF60, "usage": 0x61},
+        #MAD68R
+        {"vendor_id": 0x373B, "product_id": 0x10A7, "usage_page": 0xFF60, "usage": 0x61},
     ]
 
     _INIT_PAYLOAD = bytes([
@@ -391,7 +404,7 @@ class AsProviderMadlions(AsProvider):
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     ])
 
-    _MAD60HE_PIDS = {0x1053, 0x1055, 0x1056, 0x105D}
+    _MAD60HE_PIDS = {0x1053, 0x1054, 0x1055, 0x1056, 0x105D}
 
     def start_listening(self, handler: Handler):
         pid = self.dev.product_id
@@ -426,7 +439,7 @@ class AsProviderMadlions(AsProvider):
 
 class AsProviderBytech(AsProvider):
     FILTERS = [
-        {"vendor_id": 0x372E, "product_id": 0x105B},
+        {"vendor_id": 0x372E, "product_id": 0x105B, "usage_page": 0xFF00},  #Redragon K709 HE
     ]
 
     def _build_payload(self, cmd, sub):

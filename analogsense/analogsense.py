@@ -55,6 +55,7 @@ class AnalogSense:
                         dedup_key = (info["vendor_id"], info["product_id"], info.get("usage_page", 0), info.get("usage", 0))
                         if dedup_key in seen: continue
                         if "usage_page" in f and info.get("usage_page") != f["usage_page"]: continue
+                        if "usage" in f and info.get("usage") != f["usage"]: continue
                         seen.add(dedup_key)
                         candidates.append((info, provider_cls))
                 except Exception as e:
