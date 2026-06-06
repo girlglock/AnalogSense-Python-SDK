@@ -1,5 +1,6 @@
 from __future__ import annotations
 import sys
+import threading
 import warnings
 
 from .providers import ALL_PROVIDERS, AsProvider
@@ -51,7 +52,22 @@ class AnalogSense:
                 try:
                     vendor_id  = f.get("vendor_id", 0)
                     product_id = f.get("product_id", 0)
-                    for info in _hid.enumerate(vendor_id, product_id):
+                    result = []
+                    exc = []
+                    def _enumerate(v=vendor_id, p=product_id):
+                        try:
+                            result.extend(_hid.enumerate(v, p))
+                        except Exception as e:
+                            exc.append(e)
+                    t = threading.Thread(target=_enumerate, daemon=True)
+                    t.start()
+                    t.join(timeout=3.0)
+                    if exc:
+                        raise exc[0]
+                    if t.is_alive():
+                        warnings.warn(f"HID enumeration timed out for {vendor_id:#06x}:{product_id:#06x}, device may be in a bad state, try reconnecting")
+                        continue
+                    for info in result:
                         dedup_key = (info["vendor_id"], info["product_id"], info.get("usage_page", 0), info.get("usage", 0))
                         if dedup_key in seen: continue
                         if "usage_page" in f and info.get("usage_page") != f["usage_page"]: continue
